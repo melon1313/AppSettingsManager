@@ -3,24 +3,24 @@
 
 ## 前言 🚁
 
----
+
 在ASP.NET Core 以上的版本，要取得 appsettings.json 的設定資料，需以注入的方式取得，而常見的做法如下(以WEB API為例):
 
 ```csharp
 public class AppSettingsDemoController : ControllerBase
 {
     private readonly IConfiguration _configuration;
-    public AppSettingsDemoController(**IConfiguration configuration**)
+    public AppSettingsDemoController(IConfiguration configuration)
     {
-				**//DI注入，取得 configuration 實體
-				_configuration = configuration;**
+	//DI注入，取得 configuration 實體
+	_configuration = configuration;
     }
 
     [HttpGet("GetPasswordNotByExtension")]
     public ActionResult<string> GetPasswordNotByExtension()
     {
-				//取得密碼資訊
-        var myPassword = **_configuration.GetValue<string>("MySettings:Password");**
+	//取得密碼資訊
+        var myPassword = _configuration.GetValue<string>("MySettings:Password");
 
         return myPassword;
     }
@@ -33,7 +33,6 @@ public class AppSettingsDemoController : ControllerBase
 
 ## 建立設定檔管理員
 
----
 
 **步驟一**
 
@@ -64,8 +63,8 @@ public class MySettings
 
 ```csharp
 public static TSettingsModel ConfigureAppSettings<TSettingsModel>
-							(this IServiceCollection services, IConfiguration configuration)
-							where TSettingsModel : class, new()              
+		(this IServiceCollection services, IConfiguration configuration)
+		where TSettingsModel : class, new()              
 {
     if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
@@ -85,7 +84,6 @@ public static TSettingsModel ConfigureAppSettings<TSettingsModel>
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-
     services.AddControllers();
     services.ConfigureAppSettings<MySettings>(Configuration.GetSection("MySettings"));
 }
@@ -102,7 +100,7 @@ public class AppSettingsDemoController : ControllerBase
 {
     private readonly MySettings _mySettings;
     
-    public AppSettingsDemoController(**MySettings mySettings**)
+    public AppSettingsDemoController(MySettings mySettings)
     {
         _mySettings = mySettings;  
     }
@@ -118,7 +116,5 @@ public class AppSettingsDemoController : ControllerBase
 [完整程式碼連結](https://github.com/melon1313/AppSettingsManager.git)
 
 ## 參考
-
----
 
 [Strongly typed configuration in ASP.NET Core without IOptions<T>](https://www.strathweb.com/2016/09/strongly-typed-configuration-in-asp-net-core-without-ioptionst/)
